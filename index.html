@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving Logos with Starfield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Matemasie&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;7
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+            background-image: url('https://bernd-marbach.de/wp-content/uploads/2025/02/background_01.png');  /* Add background image */
+            background-size: cover; /* Ensures full screen coverage */
+            background-repeat: no-repeat;  /* Image shown only once (optional) */
+            background-position: center;  /* Image centered (optional) */
+        }
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        #countdown {
+            position: absolute;
+            font-size: 8rem;
+            text-align: center;
+            z-index: 10;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Matemasie', sans-serif; /* Apply the Google Font */
+        }
+        .logo {
+            position: absolute;
+            width: 350px; /* Or max-width: 50px; */
+            height: 350px; /* Or max-height: 50px; */
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <!-- <canvas id="starfield"></canvas>
+    <div id="countdown"></div>
+    <img class="logo" id="logo1" src="https://bernd-marbach.de/wp-content/uploads/2025/02/Bernd.png" alt="Logo 1">
+    <img class="logo" id="logo2" src="https://bernd-marbach.de/wp-content/uploads/2025/02/Julian.png" alt="Logo 2">
+    <script>
+        // Spring animation helper
+        class Spring {
+            constructor(stiffness = 0.1, damping = 0.8) {
+                this.stiffness = stiffness;
+                this.damping = damping;
+                this.targetValue = 0;
+                this.currentValue = 0;
+                this.velocity = 0;
+            }
+
+            update() {
+                const force = (this.targetValue - this.currentValue) * this.stiffness;
+                this.velocity = this.velocity * this.damping + force;
+                this.currentValue += this.velocity;
+                return this.currentValue;
+            }
+
+            setTarget(value) {
+                this.targetValue = value;
+            }
+        }
+
+        // Starfield setup
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Star {
+            constructor() {
+                this.reset();
+                this.size = 0.5 + Math.random() * 1.5; // Base size variation
+                this.speed = 0.05 + (1 - this.z / 1000) * 0.4; // Speed based on z
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width - canvas.width / 2;
+                this.y = Math.random() * canvas.height - canvas.height / 2;
+                this.z = Math.random() * 1000;
+            }
+
+            update() {
+                this.z -= this.speed;
+                if (this.z <= 0) {
+                    this.reset();
+                }
+
+                const perspective = 1000 / (1000 - this.z); // Perspective calculation
+                const x = this.x * perspective + canvas.width / 2;
+                const y = this.y * perspective + canvas.height / 2;
+                const size = this.size * perspective; // Correct size calculation
+
+                if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) {
+                    this.reset();
+                }
+
+                return { x, y, size };
+            }
+        }
+
+        const stars = Array(200).fill().map(() => new Star());
+
+        function animateStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Slightly transparent white
+    ctx.beginPath();
+    for (const star of stars) {
+        const pos = star.update();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.arc(pos.x, pos.y, star.size, 0, Math.PI * 2); // Use star's size
+    }
+    ctx.fill();
+
+    requestAnimationFrame(animateStars);
+}
+        animateStars();
+
+        // Countdown function
+        const countdownElement = document.getElementById('countdown');
+        const targetDate = new Date('2025-05-01T00:00:00');  // Changed to May 1st, 2025
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetDate - now;
+            if (diff <= 0) {
+                countdownElement.textContent = "Time's up!";  // Updated end message
+                clearInterval(countdownInterval);
+                return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            countdownElement.textContent = `${days}D ${hours}H ${minutes}M ${seconds}S`;
+        }
+        
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Moving logos
+        const logo1 = document.getElementById('logo1');
+        const logo2 = document.getElementById('logo2');
+        const LOGO_SIZE = 350;
+        
+        let pos1 = { x: 100, y: 100, vx: 2, vy: 1, rotationDirection: 1, rotationSpeed: 10 }; // Logo 1
+        let pos2 = { x: 300, y: 200, vx: 1, vy: 2, rotationDirection: -1, rotationSpeed: 0.7 }; // Logo 2
+
+        // Create spring rotations with smoother parameters
+        const rotation1 = new Spring(0.15, 0.9);
+        const rotation2 = new Spring(0.15, 0.9);
+
+        // Setup rotation intervals - now every second
+        setInterval(() => {
+            rotation1.setTarget(rotation1.targetValue + 50);
+        }, 1000);
+
+        setInterval(() => {
+            rotation2.setTarget(rotation2.targetValue - 40);
+        }, 1000);
+
+
+        function moveLogos() {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // Update logo 1
+            pos1.x += pos1.vx;
+            pos1.y += pos1.vy;
+
+            // Boundary checking for logo 1
+            if (pos1.x < 0) {
+                pos1.x = 0;
+                pos1.vx *= -1;
+            } else if (pos1.x > screenWidth - LOGO_SIZE) {
+                pos1.x = screenWidth - LOGO_SIZE;
+                pos1.vx *= -1;
+            }
+
+            if (pos1.y < 0) {
+                pos1.y = 0;
+                pos1.vy *= -1;
+            } else if (pos1.y > screenHeight - LOGO_SIZE) {
+                pos1.y = screenHeight - LOGO_SIZE;
+                pos1.vy *= -1;
+            }
+
+            // Update logo 2
+            pos2.x += pos2.vx;
+            pos2.y += pos2.vy;
+
+            // Boundary checking for logo 2
+            if (pos2.x < 0) {
+                pos2.x = 0;
+                pos2.vx *= -1;
+            } else if (pos2.x > screenWidth - LOGO_SIZE) {
+                pos2.x = screenWidth - LOGO_SIZE;
+                pos2.vx *= -1;
+            }
+
+            if (pos2.y < 0) {
+                pos2.y = 0;
+                pos2.vy *= -1;
+            } else if (pos2.y > screenHeight - LOGO_SIZE) {
+                pos2.y = screenHeight - LOGO_SIZE;
+                pos2.vy *= -1;
+            }
+
+            // Update spring rotations
+            const rotation1Value = rotation1.update();
+            const rotation2Value = rotation2.update();
+
+    // Update rotation directly
+    logo1.style.transform = `translate(${pos1.x}px, ${pos1.y}px) rotate(${rotation1Value + (pos1.rotationDirection * pos1.rotationSpeed)}deg)`;
+    logo2.style.transform = `translate(${pos2.x}px, ${pos2.y}px) rotate(${rotation2Value + (pos2.rotationDirection * pos2.rotationSpeed)}deg)`;
+
+            requestAnimationFrame(moveLogos);
+        }
+
+
+        moveLogos();
+    </script> -->
+</body>
+</html>
