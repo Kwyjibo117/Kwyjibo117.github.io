@@ -50,8 +50,9 @@
 <body>
     <canvas id="starfield"></canvas>
     <div id="countdown"></div>
-    <img class="logo" id="logo1" src="https://bernd-marbach.de/wp-content/uploads/2025/02/Bernd.png" alt="Logo 1">
-    <img class="logo" id="logo2" src="https://bernd-marbach.de/wp-content/uploads/2025/02/Julian.png" alt="Logo 2">
+    <img class="logo" id="logo1" src="https://bernd-marbach.de/wp-content/uploads/2025/04/Felix-Glow.png" alt="Logo 1">
+    <img class="logo" id="logo2" src="https://bernd-marbach.de/wp-content/uploads/2025/04/Bernd-Glow.png" alt="Logo 2">
+    <img class="logo" id="logo3" src="https://bernd-marbach.de/wp-content/uploads/2025/04/Julian-Glow.png" alt="Logo 3">
     <script>
         // Spring animation helper
         class Spring {
@@ -121,39 +122,39 @@
         const stars = Array(200).fill().map(() => new Star());
 
         function animateStars() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Slightly transparent white
-    ctx.beginPath();
-    for (const star of stars) {
-        const pos = star.update();
-        ctx.moveTo(pos.x, pos.y);
-        ctx.arc(pos.x, pos.y, star.size, 0, Math.PI * 2); // Use star's size
-    }
-    ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Slightly transparent white
+            ctx.beginPath();
+            for (const star of stars) {
+                const pos = star.update();
+                ctx.moveTo(pos.x, pos.y);
+                ctx.arc(pos.x, pos.y, star.size, 0, Math.PI * 2); // Use star's size
+            }
+            ctx.fill();
 
-    requestAnimationFrame(animateStars);
-}
+            requestAnimationFrame(animateStars);
+        }
         animateStars();
 
         // Countdown function
         const countdownElement = document.getElementById('countdown');
-        const targetDate = new Date('2025-05-01T00:00:00');  // Changed to May 1st, 2025
+        const targetDate = new Date('2025-05-02T16:00:00');  // Changed to May 1st, 2025
         
         function updateCountdown() {
-            const now = new Date();
-            const diff = targetDate - now;
-            if (diff <= 0) {
-                countdownElement.textContent = "Time's up!";  // Updated end message
-                clearInterval(countdownInterval);
-                return;
-            }
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-            countdownElement.textContent = `${days}D ${hours}H ${minutes}M ${seconds}S`;
-        }
+    const now = new Date();
+    const diff = targetDate - now;
+    if (diff <= 0) {
+        countdownElement.textContent = "STOP LOOKING AT YOUR PHONE!!!";
+        clearInterval(countdownInterval);
+        return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    countdownElement.innerHTML = `${days}d : ${hours}h : ${minutes}m : ${seconds}s`;
+}
         
         const countdownInterval = setInterval(updateCountdown, 1000);
         updateCountdown();
@@ -161,14 +162,17 @@
         // Moving logos
         const logo1 = document.getElementById('logo1');
         const logo2 = document.getElementById('logo2');
+        const logo3 = document.getElementById('logo3');
         const LOGO_SIZE = 350;
         
         let pos1 = { x: 100, y: 100, vx: 2, vy: 1, rotationDirection: 1, rotationSpeed: 10 }; // Logo 1
         let pos2 = { x: 300, y: 200, vx: 1, vy: 2, rotationDirection: -1, rotationSpeed: 0.7 }; // Logo 2
+        let pos3 = { x: 500, y: 300, vx: -1.5, vy: 1.5, rotationDirection: 1, rotationSpeed: 0.5 }; // Logo 3
 
         // Create spring rotations with smoother parameters
         const rotation1 = new Spring(0.15, 0.9);
         const rotation2 = new Spring(0.15, 0.9);
+        const rotation3 = new Spring(0.15, 0.9);
 
         // Setup rotation intervals - now every second
         setInterval(() => {
@@ -179,6 +183,9 @@
             rotation2.setTarget(rotation2.targetValue - 40);
         }, 1000);
 
+        setInterval(() => {
+            rotation3.setTarget(rotation3.targetValue + 60);
+        }, 1000);
 
         function moveLogos() {
             const screenWidth = window.innerWidth;
@@ -226,17 +233,39 @@
                 pos2.vy *= -1;
             }
 
+             // Update logo 3
+            pos3.x += pos3.vx;
+            pos3.y += pos3.vy;
+
+            // Boundary checking for logo 3
+            if (pos3.x < 0) {
+                pos3.x = 0;
+                pos3.vx *= -1;
+            } else if (pos3.x > screenWidth - LOGO_SIZE) {
+                pos3.x = screenWidth - LOGO_SIZE;
+                pos3.vx *= -1;
+            }
+
+            if (pos3.y < 0) {
+                pos3.y = 0;
+                pos3.vy *= -1;
+            } else if (pos3.y > screenHeight - LOGO_SIZE) {
+                pos3.y = screenHeight - LOGO_SIZE;
+                pos3.vy *= -1;
+            }
+
             // Update spring rotations
             const rotation1Value = rotation1.update();
             const rotation2Value = rotation2.update();
+            const rotation3Value = rotation3.update();
 
-    // Update rotation directly
-    logo1.style.transform = `translate(${pos1.x}px, ${pos1.y}px) rotate(${rotation1Value + (pos1.rotationDirection * pos1.rotationSpeed)}deg)`;
-    logo2.style.transform = `translate(${pos2.x}px, ${pos2.y}px) rotate(${rotation2Value + (pos2.rotationDirection * pos2.rotationSpeed)}deg)`;
+            // Update rotation directly
+            logo1.style.transform = `translate(${pos1.x}px, ${pos1.y}px) rotate(${rotation1Value + (pos1.rotationDirection * pos1.rotationSpeed)}deg)`;
+            logo2.style.transform = `translate(${pos2.x}px, ${pos2.y}px) rotate(${rotation2Value + (pos2.rotationDirection * pos2.rotationSpeed)}deg)`;
+            logo3.style.transform = `translate(${pos3.x}px, ${pos3.y}px) rotate(${rotation3Value + (pos3.rotationDirection * pos3.rotationSpeed)}deg)`;
 
             requestAnimationFrame(moveLogos);
         }
-
 
         moveLogos();
     </script>
