@@ -31,7 +31,7 @@
         }
         #countdown {
             position: absolute;
-            font-size: 2rem;
+            font-size: 9vw;
             text-align: center;
             z-index: 10;
             left: 50%;
@@ -42,8 +42,8 @@
         }
         .logo {
             position: absolute;
-            width: 150px; /* Or max-width: 50px; */
-            height: 150px; /* Or max-height: 50px; */
+            width: 15vw; /* Or max-width: 50px; */
+            height: 15vw; /* Or max-height: 50px; */
             z-index: 5;
         }
     </style>
@@ -158,13 +158,14 @@
 }
         
         const countdownInterval = setInterval(updateCountdown, 1000);
+        const getLogoSize = () => logo1.offsetWidth; // holt aktuelle Breite
         updateCountdown();
 
         // Moving logos
         const logo1 = document.getElementById('logo1');
         const logo2 = document.getElementById('logo2');
         const logo3 = document.getElementById('logo3');
-        const LOGO_SIZE = 150;
+        const LOGO_SIZE = getLogoSize();
         
         let pos1 = { x: 100, y: 100, vx: 2, vy: 1, rotationDirection: 1, rotationSpeed: 10 }; // Logo 1
         let pos2 = { x: 300, y: 200, vx: 1, vy: 2, rotationDirection: -1, rotationSpeed: 0.7 }; // Logo 2
